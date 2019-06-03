@@ -1,0 +1,9 @@
+language: python
+install:
+- pip install numpy
+- pip install Pillow
+- pip install coverage
+script:
+- coverage run test.py
+after_success:
+- coverage report -m
