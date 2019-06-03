@@ -9,6 +9,7 @@ install:
   - pip install numpy
   - pip install Pillow
   - pip install coverage
+  - pip install tensorflow
 script:
   - coverage run test.py
 after_success:
