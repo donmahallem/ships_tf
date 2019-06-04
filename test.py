@@ -45,7 +45,6 @@ def random_fill_boats(ships):
                 cells = [[x+start_y, start_x] for x in range(ship)]
             else:
                 cells = [[start_y, x+start_x] for x in range(ship)]
-            print(cells)
             if location_available(field, cells):
                 for cell in cells:
                     field[cell[0], cell[1]] = 1
@@ -54,15 +53,20 @@ def random_fill_boats(ships):
 
 
 COORDINATES = [[x % 10, x//10] for x in range(100)]
-print(COORDINATES)
+print(random.sample(COORDINATES, 4))
 # If ships are hit or destroyed
 
 
-def modify_field(ships):
+def modify_field(field, ship_tiles=sum(DEFAULT_SHIPS)):
     shots = random.sample(COORDINATES, np.random.randint(0, 101))
+    hit_count = 0
+    target_map=np.zeros((10,10,3))
     for shot in range(shots):
-        print(shot)
-
+        if field[shot[0],shot[1]] <> 0:
+            hit_count =hit_count+1
+        if hit_count == ship_tiles:
+            return field
+        
 
 test_field = random_fill_boats(DEFAULT_SHIPS)
 print(test_field)
