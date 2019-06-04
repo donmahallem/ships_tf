@@ -1,6 +1,7 @@
-import tensorflow as tf
+#import tensorflow as tf
 import numpy as np
 from PIL import Image
+import random
 DEFAULT_SHIPS = [5, 4, 4, 3, 3, 3, 2, 2, 2, 2]
 
 
@@ -52,9 +53,21 @@ def random_fill_boats(ships):
     return field
 
 
+COORDINATES = [[x % 10, x//10] for x in range(100)]
+print(COORDINATES)
+# If ships are hit or destroyed
+
+
+def modify_field(ships):
+    shots = random.sample(COORDINATES, np.random.randint(0, 101))
+    for shot in range(shots):
+        print(shot)
+
+
 test_field = random_fill_boats(DEFAULT_SHIPS)
 print(test_field)
-test_field[0:10, 1] = 1
+for s in range(20):
+    test_field[0:10, 1] = 1
 print(test_field)
 img = Image.fromarray(test_field, '1')
-img.show()
+# img.show()
