@@ -1,5 +1,5 @@
 import unittest
-from ship import Ship as sp
+from src.ship import Ship as sp
 
 
 class TestStringMethods(unittest.TestCase):
