@@ -15,6 +15,20 @@ def normalize(img):
     return (img-vmin)*1.0/(vmax-vmin)
 
 
+def bounds(contour):
+    xmin = 100000
+    ymin = 100000
+    xmax = -1
+    ymax = -1
+    for c in contour:
+        # print(c)
+        xmin = min(xmin, c[0][0])
+        ymin = min(ymin, c[0][1])
+        xmax = max(xmax, c[0][0])
+        ymax = max(ymax, c[0][1])
+    return xmin, ymin, xmax, ymax
+
+
 def asdf5(img):
     ssize = 512
     # img = cv.resize(img, (ssize, ssize), interpolation=cv.INTER_CUBIC)
@@ -27,9 +41,9 @@ def asdf5(img):
     exp_img = normalize((hlsimg[:, :, 1]/255.)**2)*-255+255  # *255  # +255
     # show(exp_img)
     exp_img = exp_img.astype(np.uint8)
-    thresh1 = cv.adaptiveThreshold(exp_img, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C,
-                                   cv.THRESH_BINARY, 15, 0)
-    #ret, thresh1 = cv.threshold(exp_img, 150, 255, cv.THRESH_BINARY)
+    #thresh1 = cv.adaptiveThreshold(exp_img, 255, cv.ADAPTIVE_THRESH_GAUSSIAN_C,                                   cv.THRESH_BINARY, 15, 0)
+    print(np.mean(exp_img))
+    ret, thresh1 = cv.threshold(exp_img, 130, 255, cv.THRESH_BINARY)
     # print(np.max(thresh1), thresh1.dtype)
     # show(exp_img)
     # print(ret, thresh1.shape)
@@ -69,10 +83,27 @@ def asdf5(img):
     # out2 = img
     # out2 += out
     # out2 = np.clip(out2, 0, 255)
+    '''
+    x1, y1, x2, y2 = bounds(contours[ll])
+    w = x2 - x1
+    h = y2 - y1
+    cx = int((x1+x2)/2)
+    cy = int((y1+y2)/2)
+    ratio_h = h/4.
+    ratio_w = w/3
+    bump_ratio = 1.1
+    bbw = w*bump_ratio
+    bbh = ratio_w*4*bump_ratio
+    if ratio_h > ratio_w:
+        bbh = h*bump_ratio
+        bbw = ratio_h*3*bump_ratio
+    half_bbw = int(bbw/2)
+    half_bbh = int(bbh/2)
+    return out2.astype(np.uint8)[cy-half_bbh:cy+half_bbh, cx-half_bbw:cx+half_bbw]'''
     return out2.astype(np.uint8)
 
 
-mypath = "./imgs"
+mypath = "./imgs2"
 onlyfiles = [f for f in listdir(mypath) if (
     isfile(join(mypath, f)) and f[-4:] == ".jpg")]
 
@@ -86,4 +117,4 @@ for testfile in onlyfiles:
     # im3 = cv.resize(a, (ssize, ssize), interpolation=cv.INTER_CUBIC)
     # im3 = cv2.drawContours(im2, contours, -1, (0, 255, 255), 3)
     show(im4, False)
-    cv.imwrite(join("./outimg", testfile), im3)
+    cv.imwrite(join("./outimg2", testfile), im3)
