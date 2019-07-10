@@ -103,6 +103,49 @@ def asdf5(img):
     return out2.astype(np.uint8)
 
 
+def asdf6(img):
+    ssize = 512
+    # img = cv.resize(img, (ssize, ssize), interpolation=cv.INTER_CUBIC)
+    #hlsimg = cv.cvtColor(img, cv.COLOR_BGR2HLS)
+    hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV)
+
+    # mask of green (36,25,25) ~ (86, 255,255)
+    # mask = cv2.inRange(hsv, (36, 25, 25), (86, 255,255))
+    mask = cv.inRange(hsv, (10, 0, 0), (90, 255, 255))
+    mask2 = cv.inRange(hsv, (0, 0, 0), (255, 255, 20))
+    #show(cv.resize(mask, (ssize, ssize), interpolation=cv.INTER_CUBIC))
+    #mask = mask-mask2
+    contours, hierarchy = cv.findContours(
+        mask, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    ll = -1
+    lls = -1
+    for idx in range(0, len(contours)):
+        c = contours[idx]
+        #print("CC", len(c))
+        if len(c) > lls:
+            ll = idx
+            lls = len(c)
+    # luminance_img
+    out = np.zeros(img.shape, dtype=np.uint8)
+    # out += 255
+    cv.fillPoly(out, pts=[contours[ll]], color=(255, 255, 255))
+
+    x1, y1, x2, y2 = bounds(contours[ll])
+    cx = int((x1+x2)/2)
+    cy = int((y1+y2)/2)
+    si = int(max(x2-x1, y2-y1)*0.6)
+    #show(cv.resize(out, (ssize, ssize), interpolation=cv.INTER_CUBIC))
+    out2 = np.zeros(img.shape, dtype=np.uint8)
+    out2[:, :, :] += 255
+    out2 = out2-out
+    out2 = out2+(out/255.*img)
+    out2 = np.clip(out2, 0, 255)
+    #show(cv.resize(out2.astype(np.uint8),                   (ssize, ssize), interpolation=cv.INTER_CUBIC))
+    #print(cx, cy, si)
+    out2 = out2[max(0,cy-si):min(cy+si,img.shape[0]), max(0,cx-si): min(cx+si,img.shape[1]), :]
+    return out2.astype(np.uint8)
+
+
 mypath = "./imgs2"
 onlyfiles = [f for f in listdir(mypath) if (
     isfile(join(mypath, f)) and f[-4:] == ".jpg")]
@@ -110,9 +153,11 @@ onlyfiles = [f for f in listdir(mypath) if (
 print(onlyfiles)
 for testfile in onlyfiles:
     img = cv.imread(join(mypath, testfile))
+    #img = img[500:5000, 500:3000, :]
     ssize = 512
-    im3 = asdf5(img)
+    im3 = asdf6(img)
     im4 = cv.resize(im3, (ssize, ssize), interpolation=cv.INTER_CUBIC)
+    im3 = cv.resize(im3, (1440, 1440), interpolation=cv.INTER_CUBIC)
 
     # im3 = cv.resize(a, (ssize, ssize), interpolation=cv.INTER_CUBIC)
     # im3 = cv2.drawContours(im2, contours, -1, (0, 255, 255), 3)
